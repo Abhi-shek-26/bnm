@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>My Reviews | BOOK N MEET</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --primary: #0061ff;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --bg-gradient: linear-gradient(135deg, #f8faff 0%, #f1f5f9 100%);
+            --reply-bg: #f8fafc;
+            --card-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.04), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+        }
+
+        body {
+            background: var(--bg-gradient);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-dark);
+            min-height: 100vh;
+        }
+
+        /* Glass Nav Bar */
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 15px 0;
+            margin-bottom: 40px;
+        }
+
+        .dashboard-btn {
+            background: white;
+            border: 1px solid #e2e8f0;
+            color: var(--text-dark);
+            font-weight: 600;
+            border-radius: 12px;
+            padding: 10px 20px;
+            transition: 0.3s;
+            text-decoration: none;
+        }
+
+        .dashboard-btn:hover {
+            background: var(--text-dark);
+            color: white;
+        }
+
+        .section-header {
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            background: linear-gradient(90deg, #0f172a, #0061ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Review Card Refinement */
+        .card-custom {
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            border-radius: 28px;
+            box-shadow: var(--card-shadow);
+            background: white;
+            margin-bottom: 24px;
+            transition: transform 0.3s ease;
+        }
+
+        .card-custom:hover {
+            transform: translateY(-5px);
+        }
+
+        .doctor-link {
+            color: var(--primary);
+            font-weight: 800;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+
+        .doctor-link:hover {
+            color: var(--text-dark);
+        }
+
+        .star-rating {
+            color: #fbbf24;
+            letter-spacing: 2px;
+        }
+
+        /* Modern Reply Section */
+        .reply-section {
+            background: var(--reply-bg);
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 5px solid var(--primary);
+            position: relative;
+        }
+
+        .reply-section::before {
+            content: "“";
+            position: absolute;
+            right: 20px;
+            top: 10px;
+            font-size: 4rem;
+            color: rgba(0, 97, 255, 0.05);
+            font-family: serif;
+            line-height: 1;
+        }
+
+        .status-badge {
+            font-size: 0.7rem;
+            padding: 6px 12px;
+            border-radius: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .comment-text {
+            font-style: italic;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="glass-nav">
+    <div class="container d-flex justify-content-between align-items-center">
+        <h4 class="fw-800 mb-0"><i class="bi bi-heart-pulse-fill text-primary me-2"></i>BOOK N MEET</h4>
+        <a href="{% url 'patient_viewbase' %}" class="dashboard-btn">
+            <i class="bi bi-house-door me-2"></i>Dashboard
+        </a>
+    </div>
+</nav>
+
+<div class="container pb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-9 col-xl-8">
+            <div class="mb-5">
+                <h1 class="section-header display-5 mb-2">My Review History</h1>
+                <p class="text-muted fs-5">Your feedback helps our medical community grow.</p>
+            </div>
+
+            {% for r in reviews %}
+            <div class="card card-custom p-4">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <span class="text-muted small">Doctor:</span>
+                            <a href="#" class="doctor-link">Dr. {{ r.doctor.doctor_name }}</a>
+                        </div>
+                        <div class="star-rating d-flex align-items-center">
+                            {% for i in "12345"|make_list %}
+                                <i class="bi bi-star{% if forloop.counter <= r.rating %}-fill{% endif %}"></i>
+                            {% endfor %}
+                            <span class="text-muted ms-3 fw-600" style="font-size: 0.75rem;">
+                                <i class="bi bi-calendar-event me-1"></i> {{ r.created_at|date:"M d, Y" }}
+                            </span>
+                        </div>
+                    </div>
+                    {% if r.reply %}
+                        <span class="badge bg-success status-badge">Resolved</span>
+                    {% else %}
+                        <span class="badge bg-light text-muted border status-badge">Pending Reply</span>
+                    {% endif %}
+                </div>
+
+                <div class="p-3 border-start border-3 bg-light bg-opacity-50 rounded-end">
+                    <p class="comment-text mb-0">"{{ r.comment }}"</p>
+                </div>
+
+                {% if r.reply %}
+                <div class="reply-section">
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="bg-primary text-white rounded-circle p-1 d-flex align-items-center justify-content-center me-2" style="width: 24px; height: 24px;">
+                            <i class="bi bi-person-check-fill" style="font-size: 0.8rem;"></i>
+                        </div>
+                        <span class="fw-800 small text-primary text-uppercase">Medical Team Response</span>
+                    </div>
+                    <p class="mb-0 text-dark small fw-500">{{ r.reply }}</p>
+                </div>
+                {% endif %}
+            </div>
+            {% empty %}
+            <div class="text-center py-5 bg-white rounded-5 shadow-sm border">
+                <i class="bi bi-chat-square-quote display-1 text-muted opacity-25"></i>
+                <h4 class="mt-4 fw-bold">No Reviews Yet</h4>
+                <p class="text-muted">Share your experience to help other patients.</p>
+                <div class="mt-4">
+                    <a href="{% url 'doctor_view' %}" class="btn btn-primary rounded-pill px-4 py-2 fw-bold">
+                        Browse Doctors
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

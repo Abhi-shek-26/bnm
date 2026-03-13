@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Booking Management | BNM Admin</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --sidebar-width: 260px;
+            --primary: #0d6efd;
+            --bg-body: #f4f7fe;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: #1b2559;
+            margin: 0;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: #ffffff;
+            position: fixed;
+            border-right: 1px solid #e2e8f0;
+            padding: 25px;
+            z-index: 1000;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            color: #a3aed0;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .nav-link.active {
+            background: var(--bg-body);
+            color: var(--primary);
+        }
+
+        .main-wrapper {
+            margin-left: var(--sidebar-width);
+            padding: 40px;
+        }
+
+        .booking-card {
+            background: white;
+            border-radius: 25px;
+            border: none;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.03);
+            padding: 30px;
+        }
+
+        .x-small { font-size: 0.75rem; }
+
+        .status-badge {
+            font-size: 0.7rem;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .status-pending { background: #fff4e5; color: #ff9800; }
+        .status-approved { background: #e6fcf5; color: #087f5b; }
+        .status-rejected { background: #fff5f5; color: #fa5252; }
+
+        .btn-action {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+            border: none;
+        }
+
+        .btn-approve { background: #e6fcf5; color: #087f5b; }
+        .btn-approve:hover { background: #087f5b; color: white; }
+        .btn-reject { background: #fff5f5; color: #fa5252; }
+        .btn-reject:hover { background: #fa5252; color: white; }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="mb-5 px-3">
+            <h4 class="fw-bold text-primary"><i class="bi bi-journal-check me-2"></i>BNM Admin</h4>
+        </div>
+        <nav>
+            <a href="{% url 'admin_viewbase' %}" class="nav-link"><i class="bi bi-grid-fill me-2"></i> Dashboard</a>
+            <a href="{% url 'doctor_view' %}" class="nav-link"><i class="bi bi-people-fill me-2"></i> Doctor List</a>
+            <a href="{% url 'view_schedule' %}" class="nav-link"><i class="bi bi-clock-fill me-2"></i> Schedules</a>
+            <a href="{% url 'admin_view_bookings' %}" class="nav-link active"><i class="bi bi-calendar-check-fill me-2"></i> Manage Bookings</a>
+            <hr class="my-4 opacity-25">
+            <a href="{% url 'logout_view' %}" class="nav-link text-danger"><i class="bi bi-box-arrow-left me-2"></i> Logout</a>
+        </nav>
+    </aside>
+
+    <div class="main-wrapper">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+
+            <div>
+                <h2 class="fw-bold mb-1">Appointment Manager</h2>
+
+                <p class="text-muted small">Viewing <strong>{{ count }}</strong> total patient requests.</p>
+            </div>
+        </div>
+
+        <div class="booking-card">
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead class="text-muted small text-uppercase">
+                        <tr>
+                            <th>Patient Detail</th>
+                            <th>Doctor & Schedule</th>
+                            <th>Date Requested</th>
+                            <th>Status</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for b in bookings %}
+                        <tr>
+                            <td>
+                                <div class="fw-bold text-dark">{{ b.patient.patient_name|default:b.patient.name }}</div>
+                                <div class="text-primary x-small fw-bold">
+                                    <i class="bi bi-person"></i> @{{ b.patient.reg_user.username }}
+                                </div>
+                                <div class="text-muted x-small">ID: #P-0{{ b.patient.id }}</div>
+                            </td>
+                            <td>
+                                <div class="fw-bold small">Dr. {{ b.doctor.doctor_name }}</div>
+                                <div class="text-muted x-small">
+                                    <i class="bi bi-calendar3"></i> {{ b.schedule.date }} |
+                                    <i class="bi bi-clock"></i> {{ b.schedule.start_time }}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="text-muted small">{{ b.created_at|date:"M d, Y" }}</div>
+                            </td>
+                            <td>
+                                <span class="status-badge
+                                    {% if b.status|lower == 'pending' %}status-pending
+                                    {% elif b.status == 'Approved' or b.status == 'Confirmed' %}status-approved
+                                    {% else %}status-rejected{% endif %}">
+                                    {{ b.status }}
+                                </span>
+                            </td>
+                            <td class="text-end">
+                                {% if b.status|lower == 'pending' %}
+                                <a href="{% url 'update_booking_status' b.id 'Approved' %}" class="btn-action btn-approve me-1" title="Approve">
+                                    <i class="bi bi-check-lg"></i>
+                                </a>
+                                <a href="{% url 'update_booking_status' b.id 'Rejected' %}" class="btn-action btn-reject" title="Reject">
+                                    <i class="bi bi-x-lg"></i>
+                                </a>
+                                {% else %}
+                                <span class="badge bg-light text-muted x-small">PROCESSED</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center py-5">
+                                <i class="bi bi-inbox fs-1 opacity-25 d-block mb-2"></i>
+                                No booking requests found.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    <a href="{% url 'admin_viewbase' %}" class="btn btn-outline-secondary rounded-pill">
+                <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+            </a>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

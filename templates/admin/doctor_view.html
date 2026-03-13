@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Doctor Registry | BNM Admin</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --sidebar-width: 260px;
+            --primary: #0d6efd;
+            --bg-body: #f4f7fe;
+            --card-shadow: 0 20px 40px rgba(0, 0, 0, 0.03);
+        }
+
+        body {
+            background-color: var(--bg-body);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: #1b2559;
+            margin: 0;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: #ffffff;
+            position: fixed;
+            left: 0;
+            top: 0;
+            border-right: 1px solid #e2e8f0;
+            padding: 25px;
+            z-index: 1000;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            color: #a3aed0;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: var(--bg-body);
+            color: var(--primary);
+        }
+
+        .nav-link i { font-size: 1.25rem; margin-right: 12px; }
+
+        /* Main Content */
+        .main-wrapper {
+            margin-left: var(--sidebar-width);
+            padding: 40px;
+        }
+
+        /* Table Card */
+        .data-card {
+            background: #ffffff;
+            border-radius: 25px;
+            border: none;
+            box-shadow: var(--card-shadow);
+            padding: 30px;
+        }
+
+        .table thead th {
+            background-color: #f8faff;
+            color: #a3aed0;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            font-weight: 800;
+            border: none;
+            padding: 15px;
+        }
+
+        .table tbody td {
+            padding: 20px 15px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .doctor-avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary), #0dcaf0);
+            color: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin-right: 15px;
+        }
+
+        .badge-specialty {
+            background-color: rgba(13, 110, 253, 0.1);
+            color: var(--primary);
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+        }
+
+        .btn-delete {
+            color: #ea6b6b;
+            background: rgba(234, 107, 107, 0.1);
+            border: none;
+            padding: 8px 12px;
+            border-radius: 10px;
+            transition: 0.3s;
+        }
+
+        .btn-delete:hover {
+            background: #ea6b6b;
+            color: white;
+        }
+
+        .search-container {
+            position: relative;
+            max-width: 300px;
+        }
+
+        .search-container i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a3aed0;
+        }
+
+        .search-input {
+            padding-left: 40px;
+            border-radius: 15px;
+            border: 1px solid #e2e8f0;
+            background: #f4f7fe;
+        }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="mb-5 px-3">
+            <h4 class="fw-bold text-primary"><i class="bi bi-heart-pulse-fill me-2"></i>BNM Admin</h4>
+        </div>
+        <nav>
+            <a href="{% url 'admin_viewbase' %}" class="nav-link"><i class="bi bi-grid-fill"></i> Overview</a>
+            <a href="{% url 'add_doctor' %}" class="nav-link"><i class="bi bi-person-plus-fill"></i> Add Doctor</a>
+            <a href="{% url 'doctor_view' %}" class="nav-link active"><i class="bi bi-people-fill"></i> Doctor List</a>
+            <a href="{% url 'admin_view_bookings' %}" class="nav-link"><i class="bi bi-calendar-check-fill"></i> Bookings</a>
+            <hr class="my-4 text-muted opacity-25">
+            <a href="{% url 'logout_view' %}" class="nav-link text-danger"><i class="bi bi-box-arrow-left"></i> Logout</a>
+        </nav>
+    </aside>
+
+    <div class="main-wrapper">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold mb-1">Doctor Registry</h2>
+                <p class="text-muted small">Manage and monitor all onboarded medical specialists.</p>
+            </div>
+            <div class="d-flex gap-3">
+                <div class="search-container">
+                    <i class="bi bi-search"></i>
+                    <input type="text" class="form-control search-input" placeholder="Search specialists...">
+                </div>
+                <a href="{% url 'add_doctor' %}" class="btn btn-primary rounded-pill px-4 fw-bold">
+                    <i class="bi bi-plus-lg me-2"></i>Add New
+                </a>
+                <a href="{% url 'admin_viewbase' %}" class="btn btn-outline-secondary rounded-pill">
+                <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+            </a>
+            </div>
+        </div>
+
+        <div class="data-card">
+            <div class="table-responsive">
+                <table class="table table-hover border-0">
+                    <thead>
+                        <tr>
+                            <th>Doctor Profile</th>
+                            <th>Specialization</th>
+                            <th>Email Address</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for i in data %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="doctor-avatar">
+                                        {{ i.doctor_name|slice:":1" }}
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold text-dark">{{ i.doctor_name }}</div>
+                                        <div class="text-muted x-small">ID: #00{{ i.id }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge-specialty">{{ i.specialization }}</span>
+                            </td>
+                            <td>
+                                <span class="text-muted small fw-semibold">{{ i.email }}</span>
+                            </td>
+                            <td class="text-end">
+                                <a href="{% url 'delete_doctor' i.id %}" class="btn-delete" onclick="return confirm('Are you sure you want to remove this doctor?')">
+                                    <i class="bi bi-trash3-fill"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center py-5 text-muted">
+                                <i class="bi bi-person-x fs-1 d-block mb-3 opacity-25"></i>
+                                No doctors registered yet.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

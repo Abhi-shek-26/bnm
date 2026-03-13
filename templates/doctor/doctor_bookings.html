@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Manage Appointments | BNM PRO</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --sidebar-width: 280px;
+            --primary-emerald: #10b981;
+            --bg-body: #f8fafc;
+            --text-main: #0f172a;
+            /* Strict Color Mapping */
+            --status-green: #10b981;
+            --status-orange: #f59e0b;
+            --status-red: #ef4444;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-main);
+        }
+
+        /* Reuse Sidebar Styling */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: #ffffff;
+            position: fixed;
+            border-right: 1px solid #e2e8f0;
+            padding: 30px 20px;
+            z-index: 1000;
+        }
+
+        .main-content { margin-left: var(--sidebar-width); padding: 40px; }
+
+        .nav-link {
+            display: flex; align-items: center;
+            padding: 14px 18px; color: #64748b;
+            border-radius: 14px; margin-bottom: 8px;
+            font-weight: 600; transition: 0.3s;
+            text-decoration: none;
+        }
+
+        .nav-link:hover { background: #f1f5f9; color: var(--primary-emerald); }
+        .nav-link.active { background: var(--primary-emerald); color: white; box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.2); }
+
+        /* Card & Table Styling */
+        .booking-card {
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            border-radius: 28px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04);
+            background: white;
+            overflow: hidden;
+        }
+
+        .table thead th {
+            background: #f8fafc;
+            padding: 18px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 800;
+            color: #64748b;
+            border: none;
+        }
+
+        .table tbody td { padding: 20px 18px; border-bottom: 1px solid #f1f5f9; }
+
+        /* Enhanced Badges */
+        .status-pill {
+            font-size: 0.7rem;
+            padding: 6px 14px;
+            border-radius: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            display: inline-block;
+        }
+        .bg-pending { background: #fffbeb; color: var(--status-orange); }
+        .bg-confirmed { background: #ecfdf5; color: var(--status-green); }
+        .bg-rejected { background: #fef2f2; color: var(--status-red); }
+
+        /* Action Buttons */
+        .btn-action-check {
+            background: var(--status-green);
+            color: white;
+            border-radius: 12px;
+            padding: 8px 16px;
+            font-weight: 700;
+            border: none;
+            transition: 0.2s;
+        }
+        .btn-action-check:hover { background: #059669; transform: scale(1.05); color: white;}
+
+        .btn-action-x {
+            background: #fff;
+            color: var(--status-red);
+            border: 1.5px solid var(--status-red);
+            border-radius: 12px;
+            padding: 8px 16px;
+            font-weight: 700;
+            transition: 0.2s;
+        }
+        .btn-action-x:hover { background: var(--status-red); color: white; }
+
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); }
+            .main-content { margin-left: 0; padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="mb-5 px-3">
+            <h4 class="fw-800 mb-0"><i class="bi bi-heart-pulse-fill text-success me-2"></i>BNM PRO</h4>
+        </div>
+
+        <nav class="nav flex-column">
+            <a class="nav-link" href="{% url 'doctor_viewbase' %}"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a>
+            <a class="nav-link active" href="{% url 'doctor_view_bookings' %}"><i class="bi bi-calendar-check-fill"></i> Appointments</a>
+            <a class="nav-link" href="{% url 'doctor_view_schedule' %}"><i class="bi bi-clock-fill"></i> My Schedules</a>
+            <a class="nav-link" href="{% url 'doctor_profile_update' %}"><i class="bi bi-person-circle"></i> Profile</a>
+            <div class="mt-auto pt-5">
+                <a class="nav-link text-danger" href="{% url 'logout_view' %}"><i class="bi bi-box-arrow-left"></i> Logout</a>
+            </div>
+        </nav>
+    </div>
+
+    <main class="main-content">
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <div>
+                <h2 class="fw-800 mb-1">Appointment Manager</h2>
+                <p class="text-muted fw-600">You have <span class="text-success">{{ bookings.count }}</span> entries in your records.</p>
+            </div>
+            <button onclick="window.print()" class="btn btn-white border rounded-pill px-4 fw-700 shadow-sm">
+                <i class="bi bi-printer me-2"></i>Print List
+            </button>
+        </div>
+
+        <div class="card booking-card">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Patient Details</th>
+                            <th>Schedule Date</th>
+                            <th>Time Slot</th>
+                            <th>Status</th>
+                            <th class="text-end">Management</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for b in bookings %}
+                        <tr>
+                            <td>
+                                <div class="fw-800 text-dark">{{ b.patient.name }}</div>
+                                <div class="text-muted small fw-600"><i class="bi bi-telephone me-1"></i> {{ b.patient.phone }}</div>
+                            </td>
+                            <td>
+                                <div class="fw-700">{{ b.schedule.date|date:"D, M d Y" }}</div>
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-primary fw-800 px-3 py-2 rounded-3">
+                                    {{ b.schedule.start_time }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="status-pill
+                                    {% if b.status == 'Pending' %}bg-pending
+                                    {% elif b.status == 'Confirmed' %}bg-confirmed
+                                    {% elif b.status == 'Cancelled' or b.status == 'Rejected' %}bg-rejected
+                                    {% else %}bg-secondary text-white{% endif %}">
+                                    {{ b.status }}
+                                </span>
+                            </td>
+                            <td class="text-end">
+                                {% if b.status == 'Pending' %}
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <a href="{% url 'update_status' b.id 'Confirmed' %}" class="btn btn-action-check" title="Approve">
+                                            <i class="bi bi-check-lg"></i>
+                                        </a>
+                                        <a href="{% url 'update_status' b.id 'Rejected' %}" class="btn btn-action-x" title="Reject">
+                                            <i class="bi bi-x-lg"></i>
+                                        </a>
+                                    </div>
+                                {% else %}
+                                    <span class="text-muted small fw-700 opacity-50">PROCESSED</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center py-5">
+                                <div class="opacity-25 mb-3">
+                                    <i class="bi bi-calendar2-x" style="font-size: 4rem;"></i>
+                                </div>
+                                <h5 class="fw-800 text-muted">No appointments found</h5>
+                                <p class="text-muted small">When patients book slots, they will appear here.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

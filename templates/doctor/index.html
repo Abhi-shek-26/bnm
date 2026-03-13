@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Doctor Dashboard | BOOK N MEET</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --sidebar-width: 280px;
+            --primary-emerald: #10b981;
+            --primary-dark: #064e3b;
+            --bg-body: #f8fafc;
+            --text-main: #0f172a;
+            --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+        }
+
+        body {
+            background-color: var(--bg-body);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-main);
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: #ffffff;
+            position: fixed;
+            border-right: 1px solid #e2e8f0;
+            padding: 30px 20px;
+            z-index: 1000;
+        }
+
+        .brand-area {
+            padding: 0 15px 40px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 14px 18px;
+            color: #64748b;
+            border-radius: 14px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            transition: 0.3s ease;
+            text-decoration: none;
+        }
+
+        .nav-link:hover {
+            background-color: #f1f5f9;
+            color: var(--primary-emerald);
+        }
+
+        .nav-link.active {
+            background: var(--primary-emerald);
+            color: white;
+            box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.2);
+        }
+
+        .nav-link i { font-size: 1.25rem; margin-right: 12px; }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 40px;
+        }
+
+        /* Stat Cards */
+        .stat-card {
+            background: white;
+            border-radius: 24px;
+            padding: 28px;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: var(--card-shadow);
+            transition: 0.3s;
+        }
+
+        .stat-card:hover { transform: translateY(-5px); }
+
+        .icon-box {
+            width: 54px; height: 54px;
+            background: #ecfdf5;
+            color: var(--primary-emerald);
+            border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.6rem;
+        }
+
+        /* Header Avatar */
+        .doctor-profile-box {
+            background: white;
+            padding: 8px 12px;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar-circle {
+            width: 42px; height: 42px;
+            background: linear-gradient(135deg, var(--primary-emerald), #34d399);
+            color: white; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800;
+        }
+
+        /* Status Badges */
+        .badge-pill {
+            padding: 6px 14px;
+            border-radius: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.65rem;
+            letter-spacing: 0.5px;
+        }
+
+        .bg-pending { background: #fffbeb; color: #d97706; }
+        .bg-confirmed { background: #ecfdf5; color: #059669; }
+        .bg-rejected { background: #fef2f2; color: #dc2626; }
+
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); transition: 0.3s; }
+            .main-content { margin-left: 0; padding: 20px; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar shadow-sm">
+        <div class="brand-area d-flex align-items-center">
+            <div class="bg-emerald p-2 rounded-3 me-2" style="background: var(--primary-emerald);">
+                <i class="bi bi-heart-pulse-fill text-white fs-4"></i>
+            </div>
+            <span class="fw-800 fs-4 tracking-tighter">BNM <span class="text-success">PRO</span></span>
+        </div>
+
+        <nav class="nav flex-column mt-2">
+            <a class="nav-link active" href="{% url 'doctor_viewbase' %}">
+                <i class="bi bi-grid-1x2-fill"></i> Dashboard
+            </a>
+
+            <a class="nav-link" href="{% url 'doctor_view_bookings' %}">
+                <i class="bi bi-calendar-event"></i> Appointments
+            </a>
+
+            <a class="nav-link" href="{% url 'doctor_view_schedule' %}">
+                <i class="bi bi-clock"></i> My Schedules
+            </a>
+
+            <a class="nav-link" href="{% url 'doctor_profile_update' %}">
+                <i class="bi bi-person-circle"></i> Profile
+            </a>
+
+            <div class="mt-auto pt-5">
+                <hr class="opacity-10">
+                <a class="nav-link text-danger" href="{% url 'logout_view' %}">
+                    <i class="bi bi-box-arrow-left"></i> Logout
+                </a>
+            </div>
+        </nav>
+    </div>
+
+    <main class="main-content">
+
+        <header class="d-flex justify-content-between align-items-center mb-5">
+            <div>
+                <h2 class="fw-800 mb-1">Welcome, Dr. {{ doctor.doctor_name }}</h2>
+                <p class="text-muted fw-500">You have <span class="text-success">{{ upcoming_appointments.count }}</span> new appointments today.</p>
+            </div>
+
+            <div class="doctor-profile-box shadow-sm">
+                <div class="text-end d-none d-sm-block">
+                    <p class="mb-0 fw-800 small">{{ doctor.specialization }}</p>
+                    <span class="badge bg-success bg-opacity-10 text-success p-1 rounded small" style="font-size: 0.6rem;">
+                        <i class="bi bi-circle-fill me-1"></i> ONLINE
+                    </span>
+                </div>
+                <div class="avatar-circle">
+                    {{ doctor.doctor_name|slice:":1"|upper }}
+                </div>
+            </div>
+        </header>
+
+        <div class="row g-4 mb-5">
+            <div class="col-xl-4 col-md-6">
+                <div class="stat-card">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <p class="text-muted small fw-700 text-uppercase mb-2">Total Patients</p>
+                            <h2 class="fw-800 mb-0">{{ unique_patients_count|default:"0" }}</h2>
+                        </div>
+                        <div class="icon-box"><i class="bi bi-people-fill"></i></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-4 col-md-6">
+                <div class="stat-card">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <p class="text-muted small fw-700 text-uppercase mb-2">Bookings</p>
+                            <h2 class="fw-800 mb-0">{{ total_bookings|default:"0" }}</h2>
+                        </div>
+                        <div class="icon-box" style="background: #f0f7ff; color: #0061ff;"><i class="bi bi-journal-check"></i></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-4 col-md-12">
+                <div class="stat-card">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <p class="text-muted small fw-700 text-uppercase mb-2">Open Slots</p>
+                            <h2 class="fw-800 mb-0">{{ today_slots_count|default:"0" }}</h2>
+                        </div>
+                        <div class="icon-box" style="background: #fffbeb; color: #f59e0b;"><i class="bi bi-calendar2-range"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card border-0 rounded-4 shadow-sm p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="fw-800 mb-0">Recent Activity</h5>
+                        <a href="{% url 'doctor_view_bookings' %}" class="btn btn-sm btn-light rounded-pill px-3 fw-bold">View All</a>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                                <tr class="text-muted small text-uppercase">
+                                    <th class="border-0">Patient Name</th>
+                                    <th class="border-0">Timing</th>
+                                    <th class="border-0">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for appointment in upcoming_appointments %}
+                                <tr>
+                                    <td class="border-0">
+                                        <div class="fw-800">{{ appointment.patient.name }}</div>
+                                        <div class="text-muted small">{{ appointment.patient.phone }}</div>
+                                    </td>
+                                    <td class="border-0">
+                                        <div class="fw-700 small">{{ appointment.schedule.date|date:"d M" }}</div>
+                                        <div class="text-success small fw-bold">{{ appointment.schedule.start_time }}</div>
+                                    </td>
+                                    <td class="border-0">
+                                        <span class="badge-pill
+                                            {% if appointment.status|lower == 'pending' %}bg-pending
+                                            {% elif appointment.status|lower == 'confirmed' %}bg-confirmed
+                                            {% elif appointment.status|lower == 'rejected' %}bg-rejected
+                                            {% else %}bg-secondary{% endif %}">
+                                            {{ appointment.status }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center py-5">
+                                        <img src="https://cdn-icons-png.flaticon.com/512/7486/7486744.png" width="60" class="opacity-25 mb-3">
+                                        <p class="text-muted small fw-600">No appointments recorded yet.</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card border-0 rounded-4 shadow-sm p-4">
+                    <h5 class="fw-800 mb-4">Practice Tools</h5>
+                    <div class="d-grid gap-3">
+                        <a href="{% url 'doctor_view_schedule' %}" class="btn btn-success rounded-pill py-3 fw-800 shadow-sm border-0">
+                            <i class="bi bi-calendar-plus me-2"></i> Update Slots
+                        </a>
+                        <a href="{% url 'doctor_profile_update' %}" class="btn btn-white border rounded-pill py-3 fw-800">
+                            <i class="bi bi-gear-wide-connected me-2"></i> Account Settings
+                        </a>
+                    </div>
+
+                    <div class="mt-4 p-4 rounded-4" style="background: var(--bg-body);">
+                        <p class="text-muted small fw-800 text-uppercase mb-3">System Updates</p>
+                        <div class="d-flex align-items-center">
+                            <div class="spinner-grow spinner-grow-sm text-success me-2"></div>
+                            <span class="small fw-600">Server Status: Optimal</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

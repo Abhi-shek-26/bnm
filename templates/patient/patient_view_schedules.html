@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Schedules | BOOK N MEET</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #0061ff;
+            --primary-soft: rgba(0, 97, 255, 0.08);
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --bg-gradient: linear-gradient(135deg, #f8faff 0%, #f1f5f9 100%);
+            --card-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.04), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+        }
+
+        body {
+            background: var(--bg-gradient);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-dark);
+            min-height: 100vh;
+        }
+
+        /* Glassmorphism Nav (Matching the Find Doctor Page) */
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 15px 0;
+            margin-bottom: 40px;
+        }
+
+        .header-title {
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            background: linear-gradient(90deg, #0f172a, #0061ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .dashboard-btn {
+            background: white;
+            border: 1px solid #e2e8f0;
+            color: var(--text-dark);
+            font-weight: 600;
+            border-radius: 12px;
+            padding: 10px 20px;
+            transition: 0.3s;
+            text-decoration: none;
+        }
+
+        .dashboard-btn:hover {
+            background: var(--text-dark);
+            color: white;
+        }
+
+        /* Schedule Card Styling */
+        .schedule-card {
+            background: white;
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 18px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            box-shadow: var(--card-shadow);
+        }
+
+        .schedule-card:hover {
+            transform: translateY(-5px) scale(1.01);
+            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.08);
+            border-color: var(--primary-soft);
+        }
+
+        .date-box {
+            background: linear-gradient(135deg, #0061ff 0%, #60efff 100%);
+            color: white;
+            min-width: 85px;
+            padding: 12px;
+            border-radius: 18px;
+            text-align: center;
+            margin-right: 20px;
+            box-shadow: 0 8px 15px rgba(0, 97, 255, 0.2);
+        }
+
+        .date-box .day { font-size: 1.4rem; font-weight: 800; display: block; line-height: 1; }
+        .date-box .month { font-size: 0.75rem; text-transform: uppercase; font-weight: 700; opacity: 0.9; }
+
+        .doctor-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            object-fit: cover;
+            border: 2px solid white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .time-badge {
+            background: var(--primary-soft);
+            color: var(--primary);
+            padding: 6px 14px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .doctor-name {
+            font-weight: 800;
+            font-size: 1.15rem;
+            color: var(--text-dark);
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+            padding: 2px 8px;
+            border-radius: 6px;
+            margin-left: 10px;
+        }
+
+        .btn-select {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 14px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .btn-select:hover {
+            background: #004ecc;
+            color: white;
+            box-shadow: 0 10px 20px rgba(0, 97, 255, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .schedule-card { flex-direction: column; text-align: center; }
+            .date-box { margin-right: 0; margin-bottom: 15px; width: 100%; }
+            .doctor-avatar { margin-bottom: 10px; }
+            .btn-select { width: 100%; margin-top: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="glass-nav">
+    <div class="container d-flex justify-content-between align-items-center">
+        <h4 class="fw-800 mb-0"><i class="bi bi-heart-pulse-fill text-primary me-2"></i>BOOK N MEET</h4>
+        <a href="{% url 'patient_viewbase' %}" class="dashboard-btn">
+            <i class="bi bi-house-door me-2"></i>Dashboard
+        </a>
+    </div>
+</nav>
+
+<div class="container pb-5">
+    <div class="text-center mb-5">
+        <h1 class="header-title display-5">Available Slots</h1>
+        <p class="text-muted fs-5">Pick a convenient time for your medical consultation.</p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+
+            {% for item in schedules %}
+            <div class="schedule-card">
+                <div class="date-box">
+                    <span class="day">{{ item.date|date:"d" }}</span>
+                    <span class="month">{{ item.date|date:"M" }}</span>
+                </div>
+
+                {% if item.doctor %}
+                    <div class="me-3 d-none d-md-block">
+                        {% if item.doctor.image %}
+                            <img src="{{ item.doctor.image.url }}" alt="Doctor" class="doctor-avatar">
+                        {% else %}
+                            <div class="doctor-avatar bg-light d-flex align-items-center justify-content-center">
+                                <i class="bi bi-person-fill text-muted fs-3"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="flex-grow-1">
+                        <div class="d-flex align-items-center">
+                            <h5 class="doctor-name mb-0">Dr. {{ item.doctor.doctor_name }}</h5>
+                            <span class="status-pill">Available</span>
+                        </div>
+                        <p class="text-muted small mb-2 fw-600">{{ item.doctor.specialization }}</p>
+
+                        <div class="time-badge">
+                            <i class="bi bi-clock-fill me-2"></i>
+                            {{ item.start_time }} - {{ item.end_time }}
+                        </div>
+                    </div>
+
+                    <div class="ms-md-3">
+                        <a href="{% url 'add_booking' %}?schedule_id={{ item.id }}&doctor_id={{ item.doctor.id }}" class="btn-select">
+                            Select Slot
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="flex-grow-1 text-danger fw-bold">
+                        <i class="bi bi-exclamation-circle me-2"></i>Slot Unassigned
+                    </div>
+                {% endif %}
+            </div>
+            {% empty %}
+            <div class="text-center py-5 bg-white rounded-5 shadow-sm">
+                <i class="bi bi-calendar-x display-1 text-muted opacity-25"></i>
+                <h4 class="mt-4 fw-bold">No Schedules Available</h4>
+                <p class="text-muted">Please check back later for new openings.</p>
+            </div>
+            {% endfor %}
+
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

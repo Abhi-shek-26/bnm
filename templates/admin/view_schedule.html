@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Duty Monitor | BNM Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        :root { --primary: #4f46e5; --bg: #f8fafc; }
+        body { background: var(--bg); font-family: 'Plus Jakarta Sans', sans-serif; }
+        .main-content { margin-left: 260px; padding: 40px; }
+        .sidebar { width: 260px; height: 100vh; position: fixed; background: white; border-right: 1px solid #e2e8f0; padding: 25px; }
+        .card-custom { background: white; border-radius: 20px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.04); padding: 25px; }
+        .progress { height: 10px; border-radius: 10px; background: #e2e8f0; }
+        .status-badge { font-size: 0.7rem; padding: 5px 12px; border-radius: 20px; font-weight: 700; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h4 class="fw-bold text-primary mb-5">BNM Admin</h4>
+        <nav class="nav flex-column gap-2">
+            <a href="{% url 'admin_viewbase' %}" class="nav-link text-muted"><i class="bi bi-grid me-2"></i>Dashboard</a>
+            <a href="{% url 'doctor_view' %}" class="nav-link text-muted"><i class="bi bi-people me-2"></i>Doctors</a>
+            <a href="{% url 'view_schedule' %}" class="nav-link text-primary fw-bold bg-light rounded-3"><i class="bi bi-calendar3 me-2"></i>Schedules</a>
+            <a href="{% url 'admin_view_bookings' %}" class="nav-link text-muted"><i class="bi bi-journal-check me-2"></i>Bookings</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold">Schedule & Token Monitor</h2>
+                <p class="text-muted">Live tracking of doctor availability and patient bookings.</p>
+            </div>
+            <a href="{% url 'add_schedule' %}" class="btn btn-primary rounded-pill px-4">Add Shift</a>
+            <a href="{% url 'admin_viewbase' %}" class="btn btn-outline-secondary rounded-pill">
+                <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+            </a>
+        </div>
+
+        <div class="card-custom">
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead class="text-muted small text-uppercase">
+                        <tr>
+                            <th>Doctor</th>
+                            <th>On-Duty Date</th>
+                            <th>Time Slot</th>
+                            <th>Booking Progress (Tokens)</th>
+                            <th class="text-center">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for i in data %}
+                        <tr>
+                            <td>
+                                <div class="fw-bold text-dark">{{ i.doctor.doctor_name }}</div>
+                                <div class="text-muted x-small">{{ i.doctor.specialization }}</div>
+                            </td>
+                            <td><i class="bi bi-calendar-event me-2 text-primary"></i>{{ i.date }}</td>
+                            <td><span class="badge bg-light text-dark border">{{ i.start_time }} - {{ i.end_time }}</span></td>
+                            <td style="min-width: 200px;">
+                                <div class="d-flex justify-content-between mb-1 small">
+                                    <span><strong>{{ i.get_booking_count }}</strong> / {{ i.max_tokens }} Booked</span>
+                                    <span class="fw-bold text-primary">{{ i.get_availability_percentage|floatformat:0 }}%</span>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar {% if i.get_availability_percentage >= 90 %}bg-danger{% else %}bg-primary{% endif %}"
+                                         role="progressbar"
+                                         style="width: {{ i.get_availability_percentage }}%"></div>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                {% if i.get_booking_count >= i.max_tokens %}
+                                    <span class="status-badge bg-danger-subtle text-danger text-uppercase">Full</span>
+                                {% else %}
+                                    <span class="status-badge bg-success-subtle text-success text-uppercase">Available</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="5" class="text-center py-5">No schedules found.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

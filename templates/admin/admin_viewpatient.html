@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Manage Patients | BNM Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        :root { --primary: #0d6efd; --bg-light: #f8faff; }
+        body { background-color: var(--bg-light); font-family: 'Plus Jakarta Sans', sans-serif; }
+        .card-table { border: none; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); background: white; }
+        .avatar-circle { width: 40px; height: 40px; background: #e2e8f0; color: #64748b; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .table thead th { background: #fcfdfe; border-top: none; color: #64748b; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; padding: 15px; }
+    </style>
+</head>
+<body class="p-4">
+
+    <div class="container-fluid">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold mb-1">Registered Patients</h2>
+                <p class="text-muted">Manage and monitor all users registered as patients.</p>
+            </div>
+            <a href="{% url 'admin_viewbase' %}" class="btn btn-outline-secondary rounded-pill">
+                <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+            </a>
+        </div>
+
+        <div class="card card-table">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Patient Detail</th>
+                            <th>Username</th>
+                            <th>Phone / Email</th>
+                            <th>Joined Date</th>
+                            <th>Status</th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in patients %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="avatar-circle">{{ p.name|slice:":1"|upper }}</div>
+                                    <div>
+                                        <div class="fw-bold text-dark">{{ p.name }}</div>
+                                        <small class="text-muted">ID: #PT-00{{ p.id }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="text-primary fw-semibold">@{{ p.reg_user.username }}</span></td>
+                            <td>
+                                <div class="small">{{ p.email|default:"No Email" }}</div>
+                                <div class="text-muted small">{{ p.phone|default:"No Phone" }}</div>
+                            </td>
+                            <td><small>{{ p.reg_user.date_joined|date:"M d, Y" }}</small></td>
+                            <td>
+                                {% if p.reg_user.is_active %}
+                                    <span class="badge bg-success-subtle text-success rounded-pill px-3">Active</span>
+                                {% else %}
+                                    <span class="badge bg-danger-subtle text-danger rounded-pill px-3">Suspended</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <button class="btn btn-sm btn-light rounded-circle" title="View Details">
+                                    <i class="bi bi-eye text-primary"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-5 text-muted">
+                                <i class="bi bi-people fs-1 opacity-25 d-block mb-3"></i>
+                                No patients registered in the system yet.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

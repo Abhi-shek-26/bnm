@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>My Appointments | BOOK N MEET</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --primary: #0061ff;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --bg-gradient: linear-gradient(135deg, #f8faff 0%, #f1f5f9 100%);
+
+            /* Strict Color Mapping */
+            --status-green: #10b981;  /* Confirmed/Approved */
+            --status-orange: #f59e0b; /* Pending */
+            --status-red: #ef4444;    /* Rejected */
+
+            --card-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.04), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+        }
+
+        body {
+            background: var(--bg-gradient);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-dark);
+            min-height: 100vh;
+        }
+
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 15px 0;
+            margin-bottom: 40px;
+        }
+
+        .dashboard-btn {
+            background: white;
+            border: 1px solid #e2e8f0;
+            color: var(--text-dark);
+            font-weight: 600;
+            border-radius: 12px;
+            padding: 10px 20px;
+            transition: 0.3s;
+            text-decoration: none;
+        }
+
+        .dashboard-btn:hover {
+            background: var(--text-dark);
+            color: white;
+        }
+
+        .history-wrapper { max-width: 900px; margin: 0 auto; padding: 0 20px; }
+
+        .section-header {
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            background: linear-gradient(90deg, #0f172a, #0061ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .booking-card {
+            background: #ffffff;
+            border-radius: 28px;
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            display: flex;
+            box-shadow: var(--card-shadow);
+        }
+
+        /* Status Strips */
+        .status-strip { width: 10px; height: auto; }
+        .strip-confirmed { background: var(--status-green); }
+        .strip-pending { background: var(--status-orange); }
+        .strip-rejected { background: var(--status-red); }
+
+        .card-content { padding: 30px; width: 100%; }
+
+        /* Status Badges */
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 6px 16px;
+            border-radius: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .badge-confirmed { background: #ecfdf5; color: var(--status-green); }
+        .badge-pending { background: #fffbeb; color: var(--status-orange); }
+        .badge-rejected { background: #fef2f2; color: var(--status-red); }
+
+        .token-box {
+            background: #f8fafc;
+            border: 2px dashed #e2e8f0;
+            border-radius: 20px;
+            padding: 15px 20px;
+            text-align: center;
+            min-width: 130px;
+        }
+
+        .token-number {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--primary);
+            display: block;
+        }
+
+        .time-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .doctor-name { font-weight: 800; font-size: 1.3rem; }
+    </style>
+</head>
+<body>
+
+<nav class="glass-nav">
+    <div class="container d-flex justify-content-between align-items-center">
+        <h4 class="fw-800 mb-0"><i class="bi bi-heart-pulse-fill text-primary me-2"></i>BOOK N MEET</h4>
+        <a href="{% url 'patient_viewbase' %}" class="dashboard-btn">
+            <i class="bi bi-house-door me-2"></i>Dashboard
+        </a>
+    </div>
+</nav>
+
+<div class="history-wrapper pb-5">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <h1 class="section-header display-5 mb-0">My History</h1>
+        <a href="{% url 'doctor_view' %}" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">
+            <i class="bi bi-plus-lg me-2"></i>Book New
+        </a>
+    </div>
+
+    {% for b in bookings %}
+    <div class="booking-card">
+        <div class="status-strip
+            {% if b.status == 'Approved' or b.status == 'Confirmed' %}strip-confirmed
+            {% elif b.status == 'Rejected' %}strip-rejected
+            {% else %}strip-pending{% endif %}">
+        </div>
+
+        <div class="card-content">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <span class="status-badge
+                        {% if b.status == 'Approved' or b.status == 'Confirmed' %}badge-confirmed
+                        {% elif b.status == 'Rejected' %}badge-rejected
+                        {% else %}badge-pending{% endif %}">
+                        {{ b.status }}
+                    </span>
+
+                    <h4 class="doctor-name mt-3 mb-1">Dr. {{ b.doctor.doctor_name }}</h4>
+                    <div class="text-muted small">
+                        <i class="bi bi-calendar3 me-2"></i>{{ b.schedule.date|date:"F d, Y" }}
+                    </div>
+                </div>
+
+                <div class="col-md-6 d-flex justify-content-md-end mt-4 mt-md-0">
+                    {% if b.status == 'Approved' or b.status == 'Confirmed' %}
+                        <div class="d-flex gap-2">
+                            <div class="token-box">
+                                <span class="time-label">Token</span>
+                                <span class="token-number">#{{ b.id }}</span>
+                            </div>
+                            <div class="token-box">
+                                <span class="time-label">Time</span>
+                                <span class="fw-800 d-block mt-1">{{ b.schedule.start_time }}</span>
+                            </div>
+                        </div>
+                    {% elif b.status == 'Rejected' %}
+                        <div class="text-end">
+                            <span class="text-danger fw-bold d-block"><i class="bi bi-x-circle me-1"></i> Declined</span>
+                            <small class="text-muted">Slot no longer available</small>
+                        </div>
+                    {% else %}
+                        <div class="text-end">
+                            <span class="text-warning fw-bold d-block"><i class="bi bi-clock-history me-1"></i> Pending</span>
+                            <small class="text-muted">Admin review in progress</small>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="text-center py-5 bg-white rounded-5 shadow-sm border">
+        <i class="bi bi-calendar2-x display-1 text-muted opacity-25"></i>
+        <h4 class="mt-4 fw-bold">No History Found</h4>
+        <p class="text-muted">You haven't booked any appointments yet.</p>
+    </div>
+    {% endfor %}
+</div>
+
+</body>
+</html>

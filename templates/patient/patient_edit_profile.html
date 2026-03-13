@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+{% load crispy_forms_tags %}
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Profile | BOOK N MEET</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #0061ff;
+      --text-dark: #0f172a;
+      --text-muted: #64748b;
+      --bg-gradient: linear-gradient(135deg, #f8faff 0%, #f1f5f9 100%);
+      --card-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.04), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+    }
+
+    body {
+      background: var(--bg-gradient);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: var(--text-dark);
+      min-height: 100vh;
+    }
+
+    /* Glass Nav Bar */
+    .glass-nav {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      padding: 15px 0;
+      margin-bottom: 40px;
+    }
+
+    .dashboard-btn {
+      background: white;
+      border: 1px solid #e2e8f0;
+      color: var(--text-dark);
+      font-weight: 600;
+      border-radius: 12px;
+      padding: 10px 20px;
+      transition: 0.3s;
+      text-decoration: none;
+    }
+
+    .dashboard-btn:hover {
+      background: var(--text-dark);
+      color: white;
+    }
+
+    .edit-card {
+      background: white;
+      border: 1px solid rgba(226, 232, 240, 0.6);
+      border-radius: 30px;
+      box-shadow: var(--card-shadow);
+      overflow: hidden;
+      margin-bottom: 50px;
+    }
+
+    .edit-header {
+      background: linear-gradient(135deg, #0061ff 0%, #60efff 100%);
+      padding: 40px 30px;
+      color: white;
+      text-align: center;
+    }
+
+    .form-body {
+      padding: 40px;
+    }
+
+    /* Modernizing Crispy Forms */
+    .form-group label {
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: var(--text-dark);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-control, .select, .textarea {
+      border-radius: 15px !important;
+      border: 2px solid #f1f5f9 !important;
+      padding: 12px 18px !important;
+      background-color: #f8fafc !important;
+      font-size: 0.95rem !important;
+      transition: all 0.2s ease !important;
+    }
+
+    .form-control:focus {
+      background-color: #fff !important;
+      border-color: var(--primary) !important;
+      box-shadow: 0 0 0 4px rgba(0, 97, 255, 0.1) !important;
+      outline: none;
+    }
+
+    .btn-save {
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 16px;
+      padding: 14px 40px;
+      font-weight: 700;
+      transition: all 0.3s ease;
+    }
+
+    .btn-save:hover {
+      background: #004ecc;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(0, 97, 255, 0.2);
+      color: white;
+    }
+
+    .btn-cancel {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.9rem;
+      transition: 0.2s;
+    }
+
+    .btn-cancel:hover {
+      color: var(--text-dark);
+    }
+
+    /* Helper text for the form */
+    .form-text {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+    }
+  </style>
+</head>
+
+<body>
+
+  <nav class="glass-nav">
+    <div class="container d-flex justify-content-between align-items-center">
+      <h4 class="fw-800 mb-0"><i class="bi bi-heart-pulse-fill text-primary me-2"></i>BOOK N MEET</h4>
+      <a href="{% url 'patient_viewbase' %}" class="dashboard-btn">
+        <i class="bi bi-house-door me-2"></i>Dashboard
+      </a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-7 col-xl-6">
+
+        <div class="edit-card">
+          <div class="edit-header">
+            <div class="mb-2">
+                <i class="bi bi-person-gear fs-1"></i>
+            </div>
+            <h3 class="mb-1 fw-800">Account Settings</h3>
+            <p class="mb-0 opacity-75 small">Keep your contact information accurate</p>
+          </div>
+
+          <div class="form-body">
+            <form method="POST" enctype="multipart/form-data">
+              {% csrf_token %}
+
+              <div class="mb-4">
+                {{ form|crispy }}
+              </div>
+
+              <div class="d-flex justify-content-between align-items-center mt-5 pt-3 border-top">
+                <a href="javascript:history.back()" class="btn-cancel">
+                    <i class="bi bi-x-lg me-1"></i> Discard Changes
+                </a>
+                <button type="submit" class="btn btn-save">
+                  Update Profile
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
